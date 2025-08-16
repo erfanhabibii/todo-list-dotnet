@@ -35,6 +35,13 @@ public class TodoRepository : ITodoRepository
     public async Task<TodoItem?> GetByIdOwnedAsync(int id, string ownerId, CancellationToken ct = default)
         => await _set.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id && t.OwnerId == ownerId, ct);
 
+    public async Task<IReadOnlyList<TodoItem>> GetAllForAdminAsync(bool? isDone = null, CancellationToken ct = default)
+    {
+        var query = _set.AsNoTracking().AsQueryable();
+        if (isDone.HasValue) query = query.Where(t => t.IsDone == isDone.Value);
+        return await query.OrderBy(t => t.CreatedAtUtc).ToListAsync(ct);
+    }
+
     public async Task AddAsync(TodoItem item, CancellationToken ct = default)
         => await _set.AddAsync(item, ct);
 

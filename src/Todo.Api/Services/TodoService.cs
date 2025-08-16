@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Todo.Core.Entities;
 using Todo.Core.UnitOfWork;
 using Todo.Api.Dtos;
+using Todo.Infrastructure.Auth;
 
 namespace Todo.Api.Services;
 
@@ -22,8 +23,16 @@ public class TodoService
                ?? throw new InvalidOperationException("User is not authenticated.");
     }
 
+    private bool IsSuperAdmin()
+        => _http.HttpContext?.User.IsInRole(AppRoles.SuperAdmin) == true;
+
     public Task<IReadOnlyList<TodoItem>> GetAllAsync(bool? isDone = null, CancellationToken ct = default)
     {
+        if (IsSuperAdmin())
+        {
+            return _uow.Todos.GetAllForAdminAsync(isDone, ct);
+        }
+        
         var ownerId = GetCurrentUserId();
         return _uow.Todos.GetAllByOwnerAsync(ownerId, isDone, ct);
     }

@@ -18,6 +18,10 @@ public interface ITodoRepository
         string ownerId,
         CancellationToken ct = default);
 
+    Task<IReadOnlyList<TodoItem>> GetAllForAdminAsync(
+        bool? isDone = null,
+        CancellationToken ct = default);
+
     Task AddAsync(TodoItem item, CancellationToken ct = default);
     void Update(TodoItem item);
     void Delete(TodoItem item);

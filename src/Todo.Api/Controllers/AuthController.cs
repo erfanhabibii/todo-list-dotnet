@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Todo.Api.Dtos;
 using Todo.Api.Services;
+using Todo.Infrastructure.Auth;
 
 namespace Todo.Api.Controllers;
 
@@ -15,23 +17,30 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDto dto)
+    [HttpPost("register-self")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RegisterSelf(RegisterSelfDto dto)
     {
-        var result = await _authService.RegisterAsync(dto.Email, dto.Password);
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
-
+        var result = await _authService.RegisterSelfAsync(dto);
+        if (!result.Succeeded) return BadRequest(result.Errors);
         return Ok(new { message = "User registered successfully" });
     }
 
+    [HttpPost("register")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
+    public async Task<IActionResult> RegisterByAdmin(RegisterByAdminDto dto)
+    {
+        var (result, userId, role) = await _authService.RegisterByAdminAsync(dto);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+        return Ok(new { message = "User registered by admin", userId, role });
+    }
+
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginDto dto)
     {
         var token = await _authService.LoginAsync(dto.Email, dto.Password);
-        if (token is null)
-            return Unauthorized(new { message = "Invalid credentials" });
-
+        if (token is null) return Unauthorized(new { message = "Invalid credentials" });
         return Ok(new { token });
     }
 }

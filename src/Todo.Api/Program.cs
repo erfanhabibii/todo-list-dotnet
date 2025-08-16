@@ -10,6 +10,7 @@ using Todo.Infrastructure.Auth;
 using Todo.Infrastructure.Data;
 using Todo.Infrastructure.Repositories;
 using Todo.Infrastructure.UnitOfWork;
+using Todo.Api.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
+}
 
 // Swagger UI
 if (app.Environment.IsDevelopment())
