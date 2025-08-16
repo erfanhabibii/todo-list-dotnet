@@ -1,0 +1,12 @@
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/bin/Debug/net9.0/Todo.Core.deps.json
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/bin/Debug/net9.0/Todo.Core.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/bin/Debug/net9.0/Todo.Core.pdb
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.GeneratedMSBuildEditorConfig.editorconfig
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.AssemblyInfoInputs.cache
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.AssemblyInfo.cs
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.csproj.CoreCompileInputs.cache
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.sourcelink.json
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/refint/Todo.Core.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/Todo.Core.pdb
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Core/obj/Debug/net9.0/ref/Todo.Core.dll

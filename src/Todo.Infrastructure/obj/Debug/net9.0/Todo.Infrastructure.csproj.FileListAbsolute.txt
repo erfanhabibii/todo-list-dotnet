@@ -1,0 +1,16 @@
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/bin/Debug/net9.0/Todo.Infrastructure.deps.json
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/bin/Debug/net9.0/Todo.Infrastructure.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/bin/Debug/net9.0/Todo.Infrastructure.pdb
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/bin/Debug/net9.0/Todo.Core.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/bin/Debug/net9.0/Todo.Core.pdb
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.csproj.AssemblyReference.cache
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.AssemblyInfoInputs.cache
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.AssemblyInfo.cs
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.csproj.CoreCompileInputs.cache
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.sourcelink.json
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Inf.6F6EFB04.Up2Date
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/refint/Todo.Infrastructure.dll
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/Todo.Infrastructure.pdb
+/home/zerotix/Documents/git/todo-list-dotnet/src/Todo.Infrastructure/obj/Debug/net9.0/ref/Todo.Infrastructure.dll
