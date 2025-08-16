@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Todo.Api.Dtos;
 using Todo.Api.Services;
 using Todo.Core.Entities;
+using Todo.Core.Auth;
 
 namespace Todo.Api.Controllers;
 
@@ -19,35 +20,51 @@ public class TodoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<TodoItem>>> GetAll([FromQuery] bool? isDone, CancellationToken ct)
+    public async Task<ActionResult<IReadOnlyList<TodoReadDto>>> GetAll(
+        [FromQuery] bool? isDone,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 20,
+        CancellationToken ct = default)
     {
-        var todos = await _service.GetAllAsync(isDone, ct);
-        return Ok(todos);
+        var items = await _service.GetAllForUserAsync(isDone, skip, take, ct);
+        return Ok(items);
+    }
+
+    [HttpGet("admin")]
+    [Authorize(Roles = AppRoles.SuperAdmin)]
+    public async Task<ActionResult<IReadOnlyList<AdminTodoReadDto>>> GetAllAdmin(
+        [FromQuery] bool? isDone,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 20,
+        CancellationToken ct = default)
+    {
+        var items = await _service.GetAllForAdminAsync(isDone, skip, take, ct);
+        return Ok(items);
     }
 
     [HttpPost]
-    public async Task<ActionResult<TodoItem>> Create(CreateTodoDto dto, CancellationToken ct)
+    public async Task<ActionResult<TodoReadDto>> Create(CreateTodoDto dto, CancellationToken ct)
     {
         var created = await _service.CreateAsync(dto, ct);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TodoItem>> GetById(int id, CancellationToken ct)
+    public async Task<ActionResult<TodoReadDto>> GetById(int id, CancellationToken ct)
     {
         var todo = await _service.GetByIdAsync(id, ct);
         return todo is null ? NotFound(new { message = "Todo not found." }) : Ok(todo);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<TodoItem>> Update(int id, UpdateTodoDto dto, CancellationToken ct)
+    public async Task<ActionResult<TodoReadDto>> Update(int id, UpdateTodoDto dto, CancellationToken ct)
     {
         var updated = await _service.UpdateAsync(id, dto, ct);
         return updated is null ? NotFound(new { message = "Todo not found." }) : Ok(updated);
     }
 
     [HttpPatch("{id:int}")]
-    public async Task<ActionResult<TodoItem>> Patch(int id, PatchTodoDto dto, CancellationToken ct)
+    public async Task<ActionResult<TodoReadDto>> Patch(int id, PatchTodoDto dto, CancellationToken ct)
     {
         var updated = await _service.PatchAsync(id, dto, ct);
         return updated is null ? NotFound(new { message = "Todo not found." }) : Ok(updated);

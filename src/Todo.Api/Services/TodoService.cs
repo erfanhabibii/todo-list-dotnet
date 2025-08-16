@@ -3,18 +3,25 @@ using Todo.Core.Entities;
 using Todo.Core.UnitOfWork;
 using Todo.Api.Dtos;
 using Todo.Infrastructure.Auth;
+using AutoMapper;
+using Todo.Core.Auth;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper.QueryableExtensions;
 
 namespace Todo.Api.Services;
 
 public class TodoService
 {
+    private const int MaxPageSize = 100;
     private readonly IUnitOfWork _uow;
     private readonly IHttpContextAccessor _http;
+    private readonly IMapper _mapper;
 
-    public TodoService(IUnitOfWork uow, IHttpContextAccessor http)
+    public TodoService(IUnitOfWork uow, IHttpContextAccessor http, IMapper mapper)
     {
         _uow = uow;
         _http = http;
+        _mapper = mapper;
     }
 
     private string GetCurrentUserId()
@@ -26,76 +33,95 @@ public class TodoService
     private bool IsSuperAdmin()
         => _http.HttpContext?.User.IsInRole(AppRoles.SuperAdmin) == true;
 
-    public Task<IReadOnlyList<TodoItem>> GetAllAsync(bool? isDone = null, CancellationToken ct = default)
+    private static int ClampTake(int take) =>
+        take <= 0 ? 20 : (take > MaxPageSize ? MaxPageSize : take);
+
+    public Task<List<AdminTodoReadDto>> GetAllForAdminAsync(bool? isDone, int skip, int take, CancellationToken ct = default)
+    {
+        var query = _uow.Todos.QueryAllForAdmin(isDone);
+        return query
+            .Skip(skip < 0 ? 0 : skip)
+            .Take(ClampTake(take))
+            .ProjectTo<AdminTodoReadDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(ct);
+    }
+
+    public Task<List<TodoReadDto>> GetAllForUserAsync(bool? isDone, int skip, int take, CancellationToken ct = default)
+    {
+        var ownerId = GetCurrentUserId();
+        var query = _uow.Todos.QueryByOwner(ownerId, isDone);
+        return query
+            .Skip(skip < 0 ? 0 : skip)
+            .Take(ClampTake(take))
+            .ProjectTo<TodoReadDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(ct);
+    }
+
+    public async Task<TodoReadDto?> GetByIdAsync(int id, CancellationToken ct = default)
     {
         if (IsSuperAdmin())
         {
-            return _uow.Todos.GetAllForAdminAsync(isDone, ct);
+            var any = await _uow.Todos.GetByIdAsync(id, ct);
+            return any is null ? null : _mapper.Map<TodoReadDto>(any);
         }
-        
+
         var ownerId = GetCurrentUserId();
-        return _uow.Todos.GetAllByOwnerAsync(ownerId, isDone, ct);
+        var item = await _uow.Todos.GetByIdOwnedAsync(id, ownerId, ct);
+        return item is null ? null : _mapper.Map<TodoReadDto>(item);
     }
 
-    public async Task<TodoItem?> GetByIdAsync(int id, CancellationToken ct = default)
-    {
-        var ownerId = GetCurrentUserId();
-        return await _uow.Todos.GetByIdOwnedAsync(id, ownerId, ct);
-    }
-
-    public async Task<TodoItem> CreateAsync(CreateTodoDto dto, CancellationToken ct = default)
+    public async Task<TodoReadDto> CreateAsync(CreateTodoDto dto, CancellationToken ct = default)
     {
         var ownerId = GetCurrentUserId();
 
-        var todo = new TodoItem
-        {
-            Title = dto.Title,
-            CreatedAtUtc = DateTime.UtcNow,
-            IsDone = false,
-            OwnerId = ownerId
-        };
+        var todo = _mapper.Map<TodoItem>(dto);
+        todo.OwnerId = ownerId;
 
         await _uow.Todos.AddAsync(todo, ct);
         await _uow.SaveChangesAsync(ct);
 
-        return todo;
+        return _mapper.Map<TodoReadDto>(todo);
     }
 
-    public async Task<TodoItem?> UpdateAsync(int id, UpdateTodoDto dto, CancellationToken ct = default)
+    public async Task<TodoReadDto?> UpdateAsync(int id, UpdateTodoDto dto, CancellationToken ct = default)
     {
-        var ownerId = GetCurrentUserId();
-        var current = await _uow.Todos.GetByIdOwnedAsync(id, ownerId, ct);
-        if (current is null) return null;
+        var entity = IsSuperAdmin()
+            ? await _uow.Todos.GetByIdAsync(id, ct)
+            : await _uow.Todos.GetByIdOwnedAsync(id, GetCurrentUserId(), ct);
 
-        current.Title = dto.Title;
-        current.IsDone = dto.IsDone;
+        if (entity is null) return null;
 
-        _uow.Todos.Update(current);
+        _mapper.Map(dto, entity);
+        _uow.Todos.Update(entity);
         await _uow.SaveChangesAsync(ct);
-        return current;
+
+        return _mapper.Map<TodoReadDto>(entity);
     }
 
-    public async Task<TodoItem?> PatchAsync(int id, PatchTodoDto dto, CancellationToken ct = default)
+    public async Task<TodoReadDto?> PatchAsync(int id, PatchTodoDto dto, CancellationToken ct = default)
     {
-        var ownerId = GetCurrentUserId();
-        var current = await _uow.Todos.GetByIdOwnedAsync(id, ownerId, ct);
-        if (current is null) return null;
+        var entity = IsSuperAdmin()
+            ? await _uow.Todos.GetByIdAsync(id, ct)
+            : await _uow.Todos.GetByIdOwnedAsync(id, GetCurrentUserId(), ct);
 
-        if (dto.Title is not null) current.Title = dto.Title;
-        if (dto.IsDone.HasValue) current.IsDone = dto.IsDone.Value;
+        if (entity is null) return null;
 
-        _uow.Todos.Update(current);
+        _mapper.Map(dto, entity);
+        _uow.Todos.Update(entity);
         await _uow.SaveChangesAsync(ct);
-        return current;
+
+        return _mapper.Map<TodoReadDto>(entity);
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var ownerId = GetCurrentUserId();
-        var current = await _uow.Todos.GetByIdOwnedAsync(id, ownerId, ct);
-        if (current is null) return false;
+        var entity = IsSuperAdmin()
+            ? await _uow.Todos.GetByIdAsync(id, ct)
+            : await _uow.Todos.GetByIdOwnedAsync(id, GetCurrentUserId(), ct);
 
-        _uow.Todos.Delete(current);
+        if (entity is null) return false;
+
+        _uow.Todos.Delete(entity);
         await _uow.SaveChangesAsync(ct);
         return true;
     }

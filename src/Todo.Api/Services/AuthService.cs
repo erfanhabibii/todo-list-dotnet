@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Todo.Api.Dtos;
-using Todo.Infrastructure.Auth;
+using Todo.Core.Auth;
 using Todo.Infrastructure.Data;
+using Todo.Infrastructure.Auth;
 
 namespace Todo.Api.Services;
 

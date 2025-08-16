@@ -8,44 +8,37 @@ namespace Todo.Infrastructure.Repositories;
 public class TodoRepository : ITodoRepository
 {
     private readonly AppDbContext _db;
-    private readonly DbSet<TodoItem> _set;
 
     public TodoRepository(AppDbContext db)
     {
         _db = db;
-        _set = db.Set<TodoItem>();
     }
 
     public async Task<TodoItem?> GetByIdAsync(int id, CancellationToken ct = default)
-        => await _set.FindAsync(new object[] { id }, ct);
-
-    public async Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default)
-        => await _set.AsNoTracking().OrderBy(t => t.CreatedAtUtc).ToListAsync(ct);
-
-    public async Task<IReadOnlyList<TodoItem>> GetOpenAsync(CancellationToken ct = default)
-        => await _set.AsNoTracking().Where(t => !t.IsDone).OrderBy(t => t.CreatedAtUtc).ToListAsync(ct);
-
-    public async Task<IReadOnlyList<TodoItem>> GetAllByOwnerAsync(string ownerId, bool? isDone = null, CancellationToken ct = default)
-    {
-        var query = _set.AsNoTracking().Where(t => t.OwnerId == ownerId);
-        if (isDone.HasValue) query = query.Where(t => t.IsDone == isDone.Value);
-        return await query.OrderBy(t => t.CreatedAtUtc).ToListAsync(ct);
-    }
+        => await _db.Set<TodoItem>().FindAsync(new object[] { id }, ct);
 
     public async Task<TodoItem?> GetByIdOwnedAsync(int id, string ownerId, CancellationToken ct = default)
-        => await _set.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id && t.OwnerId == ownerId, ct);
+        => await _db.Set<TodoItem>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id && t.OwnerId == ownerId, ct);
 
-    public async Task<IReadOnlyList<TodoItem>> GetAllForAdminAsync(bool? isDone = null, CancellationToken ct = default)
+    public IQueryable<TodoItem> QueryAllForAdmin(bool? isDone = null)
     {
-        var query = _set.AsNoTracking().AsQueryable();
-        if (isDone.HasValue) query = query.Where(t => t.IsDone == isDone.Value);
-        return await query.OrderBy(t => t.CreatedAtUtc).ToListAsync(ct);
+        var q = _db.Set<TodoItem>().AsNoTracking().AsQueryable();
+        if (isDone.HasValue) q = q.Where(t => t.IsDone == isDone.Value);
+        return q.OrderBy(t => t.CreatedAtUtc);
+    }
+
+    public IQueryable<TodoItem> QueryByOwner(string ownerId, bool? isDone = null)
+    {
+        var q = _db.Set<TodoItem>().AsNoTracking().Where(t => t.OwnerId == ownerId);
+        if (isDone.HasValue) q = q.Where(t => t.IsDone == isDone.Value);
+        return q.OrderBy(t => t.CreatedAtUtc);
     }
 
     public async Task AddAsync(TodoItem item, CancellationToken ct = default)
-        => await _set.AddAsync(item, ct);
+        => await _db.Set<TodoItem>().AddAsync(item, ct);
 
-    public void Update(TodoItem item) => _set.Update(item);
-
-    public void Delete(TodoItem item) => _set.Remove(item);
+    public void Update(TodoItem item) => _db.Set<TodoItem>().Update(item);
+    public void Delete(TodoItem item) => _db.Set<TodoItem>().Remove(item);
 }

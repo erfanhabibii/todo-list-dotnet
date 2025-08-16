@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Todo.Api.Dtos;
 using Todo.Api.Services;
-using Todo.Infrastructure.Auth;
+using Todo.Core.Auth;
 
 namespace Todo.Api.Controllers;
 

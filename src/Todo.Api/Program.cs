@@ -60,6 +60,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

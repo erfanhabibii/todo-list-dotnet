@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
@@ -22,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Todo.Infrastructure\Todo.Infrastructure.csproj" />
+    <ProjectReference Include="..\Todo.Core\Todo.Core.csproj" />
   </ItemGroup>
 
 </Project>

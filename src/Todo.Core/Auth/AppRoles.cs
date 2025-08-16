@@ -1,4 +1,4 @@
-namespace Todo.Infrastructure.Auth;
+namespace Todo.Core.Auth;
 
 public static class AppRoles
 {
